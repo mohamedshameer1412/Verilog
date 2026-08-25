@@ -1,0 +1,390 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SystemVerilog Lab Notes</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+:root{--bg:#0d1117;--card:#161b22;--border:#30363d;--accent:#58a6ff;--green:#3fb950;--yellow:#d29922;--red:#f85149;--purple:#bc8cff;--text:#e6edf3;--muted:#8b949e;--code:#010409}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.7}
+header{background:linear-gradient(135deg,#1f2937,#111827);border-bottom:1px solid var(--border);padding:2rem;text-align:center}
+header h1{font-size:2rem;font-weight:700;color:var(--accent)}
+header p{color:var(--muted);margin-top:.3rem}
+nav{background:var(--card);border-bottom:1px solid var(--border);padding:1rem 2rem;display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center}
+nav a{color:var(--muted);text-decoration:none;padding:.3rem .8rem;border-radius:6px;font-size:.85rem;border:1px solid var(--border);transition:all .2s}
+nav a:hover{color:var(--accent);border-color:var(--accent)}
+.container{max-width:1100px;margin:0 auto;padding:2rem}
+.program{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:3rem;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.4)}
+.prog-header{padding:1.2rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:1rem;background:#1c2128}
+.prog-num{background:var(--accent);color:#000;font-weight:700;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0}
+.prog-title{font-size:1.05rem;font-weight:600}
+.prog-sub{color:var(--muted);font-size:.8rem;margin-top:.1rem}
+.tag{font-size:.7rem;padding:.2rem .5rem;border-radius:4px;font-weight:600;margin-left:auto}
+.t-arr{background:rgba(88,166,255,.15);color:var(--accent)}
+.t-enum{background:rgba(188,140,255,.15);color:var(--purple)}
+.t-q{background:rgba(63,185,80,.15);color:var(--green)}
+.t-fork{background:rgba(210,153,34,.15);color:var(--yellow)}
+.t-fn{background:rgba(248,81,73,.15);color:var(--red)}
+.slabel{font-size:.7rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:.7rem 1.5rem .3rem}
+.obj{padding:.5rem 1.5rem 1rem;color:#cdd9e5;font-size:.92rem;border-bottom:1px solid var(--border);background:rgba(88,166,255,.03)}
+.obj strong{color:var(--accent)}
+.tabs{display:flex;border-bottom:1px solid var(--border);background:#1c2128}
+.tb{padding:.7rem 1.2rem;font-size:.82rem;color:var(--muted);background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;font-family:inherit}
+.tb.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tc{display:none}
+.tc.active{display:block}
+pre{background:var(--code);padding:1.5rem;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:.82rem;line-height:1.6;border:1px solid #21262d;margin:0}
+.kw{color:#ff7b72}.cm{color:#8b949e}.st{color:#a5d6ff}.nm{color:#79c0ff}.fn{color:#d2a8ff}.op{color:#ffa657}.mn{color:#7ee787}
+.ob{background:var(--code);border:1px solid #21262d;padding:1.5rem;font-family:'JetBrains Mono',monospace;font-size:.82rem;line-height:1.6;color:#b0d0ff}
+.o-sep{color:#3fb950}.o-hdr{color:#ffa657;font-weight:600}.o-lbl{color:#d2a8ff}.o-val{color:#7ee787}.o-ok{color:#3fb950;font-weight:700}.o-warn{color:#d29922;font-weight:700}.o-err{color:#f85149;font-weight:700}
+.cb{margin:0;padding:1.2rem 1.5rem;background:rgba(88,166,255,.04);border-top:1px solid var(--border)}
+.cb h4{color:var(--accent);font-size:.85rem;margin-bottom:.6rem}
+.cb ul{list-style:none;padding-left:1rem}
+.cb li{font-size:.82rem;color:var(--muted);padding:.15rem 0}
+.cb li::before{content:"▸ ";color:var(--accent)}
+</style>
+</head>
+<body>
+<header>
+<h1>⚡ SystemVerilog Lab Programs</h1>
+<p>10 Programs · Arrays · Enums · Queues · Tasks · Functions · Fork/Join</p>
+</header>
+<nav>
+<a href="#p1">P1: Student Marks</a><a href="#p2">P2: Temp Sensor</a><a href="#p3">P3: Memory 16x8</a>
+<a href="#p4">P4: Traffic Light</a><a href="#p5">P5: FIFO Queue</a><a href="#p6">P6: ALU Case</a>
+<a href="#p7">P7: Traffic Signal</a><a href="#p8">P8: Fork/Join</a><a href="#p9">P9: Memory Task</a><a href="#p10">P10: 4-bit ALU</a>
+</nav>
+<div class="container">
+<div class='program' id='p1'>
+<div class='prog-header'><div class='prog-num'>1</div><div><div class='prog-title'>Student Mark Sheet</div><div class='prog-sub'>Arrays · foreach · grade calculation</div></div><span class='tag t-arr'>ARRAY</span></div>
+<div class='slabel'>Objective</div><div class='obj'>Store marks of <strong>five subjects</strong> using an array and calculate the <strong>total, average, and grade</strong>.</div>
+<div class='tabs'>
+<button class='tb active' onclick="showTab('p1','c')">Code</button>
+<button class='tb' onclick="showTab('p1','t')">Testbench</button>
+<button class='tb' onclick="showTab('p1','o')">Output</button>
+</div>
+<div id='p1-c' class='tc active'><pre>
+<span class='cm'>// Program 1: Student marks - total, average, grade</span>
+<span class='kw'>module</span> <span class='mn'>student_marks</span>;
+  <span class='kw'>int</span>    marks[<span class='nm'>5</span>]; <span class='kw'>int</span> total; <span class='kw'>real</span> average; <span class='kw'>string</span> grade;
+  <span class='kw'>initial begin</span>
+    marks[<span class='nm'>0</span>]=<span class='nm'>85</span>; marks[<span class='nm'>1</span>]=<span class='nm'>72</span>; marks[<span class='nm'>2</span>]=<span class='nm'>90</span>; marks[<span class='nm'>3</span>]=<span class='nm'>65</span>; marks[<span class='nm'>4</span>]=<span class='nm'>78</span>;
+    total=<span class='nm'>0</span>; <span class='kw'>foreach</span>(marks[i]) total+=marks[i];
+    average=<span class='kw'>real</span>'(total)/<span class='nm'>5.0</span>;
+    <span class='kw'>if</span>(average>=<span class='nm'>90</span>) grade=<span class='st'>&quot;A+&quot;</span>; <span class='kw'>else if</span>(average>=<span class='nm'>80</span>) grade=<span class='st'>&quot;A&quot;</span>;
+    <span class='kw'>else if</span>(average>=<span class='nm'>70</span>) grade=<span class='st'>&quot;B&quot;</span>; <span class='kw'>else if</span>(average>=<span class='nm'>60</span>) grade=<span class='st'>&quot;C&quot;</span>;
+    <span class='kw'>else if</span>(average>=<span class='nm'>50</span>) grade=<span class='st'>&quot;D&quot;</span>; <span class='kw'>else</span> grade=<span class='st'>&quot;F&quot;</span>;
+    <span class='op'>$display</span>(<span class='st'>&quot;===== Student Mark Sheet =====&quot;</span>);
+    <span class='kw'>foreach</span>(marks[i]) <span class='op'>$display</span>(<span class='st'>&quot;Subject %0d : %0d&quot;</span>,i+<span class='nm'>1</span>,marks[i]);
+    <span class='op'>$display</span>(<span class='st'>&quot;Total   : %0d / 500&quot;</span>,total);
+    <span class='op'>$display</span>(<span class='st'>&quot;Average : %.2f&quot;</span>,average);
+    <span class='op'>$display</span>(<span class='st'>&quot;Grade   : %s&quot;</span>,grade);
+  <span class='kw'>end</span>
+<span class='kw'>endmodule</span></pre></div>
+<div id='p1-t' class='tc'><pre><span class='kw'>module</span> <span class='mn'>tb_student_marks</span>; <span class='mn'>student_marks</span> dut(); <span class='kw'>initial begin</span> #<span class='nm'>10</span>; <span class='op'>$finish</span>; <span class='kw'>end endmodule</span></pre></div>
+<div id='p1-o' class='tc'><div class='ob'>
+<span class='o-sep'>===== Student Mark Sheet =====</span>
+<span class='o-lbl'>Subject 1 : </span><span class='o-val'>85</span><br><span class='o-lbl'>Subject 2 : </span><span class='o-val'>72</span><br><span class='o-lbl'>Subject 3 : </span><span class='o-val'>90</span><br><span class='o-lbl'>Subject 4 : </span><span class='o-val'>65</span><br><span class='o-lbl'>Subject 5 : </span><span class='o-val'>78</span>
+<br><span class='o-hdr'>Total   : </span><span class='o-val'>390 / 500</span><br><span class='o-hdr'>Average : </span><span class='o-val'>78.00</span><br><span class='o-hdr'>Grade   : </span><span class='o-ok'>B</span>
+</div></div>
+<div class='cb'><h4>Key Concepts</h4><ul><li><code>int marks[5]</code> — fixed-size unpacked int array</li><li><code>foreach(marks[i])</code> — auto-iterates all elements</li><li><code>real'(total)</code> — type cast for fractional division</li></ul></div>
+</div>
+<div class='program' id='p2'><div class='prog-header'><div class='prog-num'>2</div><div><div class='prog-title'>Temperature Sensor Array</div><div class='prog-sub'>Real arrays · min/max/avg</div></div><span class='tag t-arr'>ARRAY</span></div>
+<div class='slabel'>Objective</div><div class='obj'>Store temperature readings from multiple sensors and determine <strong>minimum, maximum, and average temperature</strong>.</div>
+<div class='tabs'><button class='tb active' onclick="showTab('p2','c')">Code</button><button class='tb' onclick="showTab('p2','t')">Testbench</button><button class='tb' onclick="showTab('p2','o')">Output</button></div>
+<div id='p2-c' class='tc active'><pre>
+<span class='kw'>module</span> <span class='mn'>temperature_sensor</span>;
+  <span class='kw'>real</span> temp[<span class='nm'>8</span>]; <span class='kw'>real</span> min_t,max_t,sum_t,avg_t;
+  <span class='kw'>initial begin</span>
+    temp[<span class='nm'>0</span>]=<span class='nm'>23.5</span>;temp[<span class='nm'>1</span>]=<span class='nm'>31.2</span>;temp[<span class='nm'>2</span>]=<span class='nm'>18.7</span>;temp[<span class='nm'>3</span>]=<span class='nm'>27.0</span>;
+    temp[<span class='nm'>4</span>]=<span class='nm'>35.1</span>;temp[<span class='nm'>5</span>]=<span class='nm'>22.4</span>;temp[<span class='nm'>6</span>]=<span class='nm'>29.8</span>;temp[<span class='nm'>7</span>]=<span class='nm'>16.3</span>;
+    min_t=temp[<span class='nm'>0</span>]; max_t=temp[<span class='nm'>0</span>]; sum_t=<span class='nm'>0.0</span>;
+    <span class='kw'>foreach</span>(temp[i]) <span class='kw'>begin</span>
+      sum_t+=temp[i];
+      <span class='kw'>if</span>(temp[i]&lt;min_t) min_t=temp[i];
+      <span class='kw'>if</span>(temp[i]&gt;max_t) max_t=temp[i];
+    <span class='kw'>end</span>
+    avg_t=sum_t/<span class='nm'>8.0</span>;
+    <span class='op'>$display</span>(<span class='st'>&quot;Sensor Report&quot;</span>);
+    <span class='kw'>foreach</span>(temp[i]) <span class='op'>$display</span>(<span class='st'>&quot;Sensor %0d : %.1f C&quot;</span>,i,temp[i]);
+    <span class='op'>$display</span>(<span class='st'>&quot;Min: %.1f  Max: %.1f  Avg: %.2f&quot;</span>,min_t,max_t,avg_t);
+  <span class='kw'>end</span>
+<span class='kw'>endmodule</span></pre></div>
+<div id='p2-t' class='tc'><pre><span class='kw'>module</span> <span class='mn'>tb_temp</span>; <span class='mn'>temperature_sensor</span> dut(); <span class='kw'>initial begin</span> #<span class='nm'>10</span>; <span class='op'>$finish</span>; <span class='kw'>end endmodule</span></pre></div>
+<div id='p2-o' class='tc'><div class='ob'><span class='o-sep'>===== Temperature Sensor Report =====</span><br>
+Sensor 0: <span class='o-val'>23.5 C</span><br>Sensor 1: <span class='o-val'>31.2 C</span><br>Sensor 2: <span class='o-val'>18.7 C</span><br>Sensor 3: <span class='o-val'>27.0 C</span><br>
+Sensor 4: <span class='o-val'>35.1 C</span><br>Sensor 5: <span class='o-val'>22.4 C</span><br>Sensor 6: <span class='o-val'>29.8 C</span><br>Sensor 7: <span class='o-val'>16.3 C</span><br>
+<span class='o-sep'>-----</span><br>Min: <span class='o-err'>16.3 C</span> &nbsp; Max: <span class='o-ok'>35.1 C</span> &nbsp; Avg: <span class='o-val'>25.50 C</span></div></div>
+<div class='cb'><h4>Key Concepts</h4><ul><li><code>real temp[8]</code> — array of floating-point reals</li><li>Running min/max using conditional inside foreach</li><li>Floating-point division for average</li></ul></div></div>
+<div class='program' id='p3'><div class='prog-header'><div class='prog-num'>3</div><div><div class='prog-title'>16x8-bit Memory Model</div><div class='prog-sub'>Packed/unpacked arrays · tasks</div></div><span class='tag t-arr'>MEMORY</span></div>
+<div class='slabel'>Objective</div><div class='obj'>Model a <strong>16x8-bit memory</strong> using packed/unpacked arrays and perform <strong>read and write operations</strong>.</div>
+<div class='tabs'><button class='tb active' onclick="showTab('p3','c')">Code</button><button class='tb' onclick="showTab('p3','t')">Testbench</button><button class='tb' onclick="showTab('p3','o')">Output</button></div>
+<div id='p3-c' class='tc active'><pre>
+<span class='kw'>module</span> <span class='mn'>memory_model</span>;
+  <span class='kw'>logic</span> [<span class='nm'>7:0</span>] mem [<span class='nm'>0:15</span>];  <span class='cm'>// 16 locations x 8 bits</span>
+  <span class='kw'>task automatic</span> <span class='fn'>write_mem</span>(<span class='kw'>input int</span> addr,<span class='kw'>input logic</span>[<span class='nm'>7:0</span>] data);
+    mem[addr]=data; <span class='op'>$display</span>(<span class='st'>&quot;[WRITE] addr=%0d data=0x%02h&quot;</span>,addr,data);
+  <span class='kw'>endtask</span>
+  <span class='kw'>task automatic</span> <span class='fn'>read_mem</span>(<span class='kw'>input int</span> addr);
+    <span class='op'>$display</span>(<span class='st'>&quot;[READ ] addr=%0d data=0x%02h&quot;</span>,addr,mem[addr]);
+  <span class='kw'>endtask</span>
+  <span class='kw'>initial begin</span>
+    <span class='fn'>write_mem</span>(<span class='nm'>0</span>,<span class='nm'>8'hA5</span>); <span class='fn'>write_mem</span>(<span class='nm'>1</span>,<span class='nm'>8'h3C</span>); <span class='fn'>write_mem</span>(<span class='nm'>5</span>,<span class='nm'>8'hFF</span>);
+    <span class='fn'>write_mem</span>(<span class='nm'>10</span>,<span class='nm'>8'h00</span>); <span class='fn'>write_mem</span>(<span class='nm'>15</span>,<span class='nm'>8'h7E</span>);
+    <span class='fn'>read_mem</span>(<span class='nm'>0</span>); <span class='fn'>read_mem</span>(<span class='nm'>1</span>); <span class='fn'>read_mem</span>(<span class='nm'>5</span>); <span class='fn'>read_mem</span>(<span class='nm'>10</span>); <span class='fn'>read_mem</span>(<span class='nm'>15</span>);
+  <span class='kw'>end</span>
+<span class='kw'>endmodule</span></pre></div>
+<div id='p3-t' class='tc'><pre><span class='kw'>module</span> <span class='mn'>tb_mem</span>; <span class='mn'>memory_model</span> dut(); <span class='kw'>initial begin</span> #<span class='nm'>10</span>; <span class='op'>$finish</span>; <span class='kw'>end endmodule</span></pre></div>
+<div id='p3-o' class='tc'><div class='ob'>
+[WRITE] addr=0  data=<span class='o-val'>0xA5</span><br>[WRITE] addr=1  data=<span class='o-val'>0x3C</span><br>[WRITE] addr=5  data=<span class='o-val'>0xFF</span><br>[WRITE] addr=10 data=<span class='o-val'>0x00</span><br>[WRITE] addr=15 data=<span class='o-val'>0x7E</span><br>
+[READ ] addr=0  data=<span class='o-ok'>0xA5</span><br>[READ ] addr=1  data=<span class='o-ok'>0x3C</span><br>[READ ] addr=5  data=<span class='o-ok'>0xFF</span><br>[READ ] addr=10 data=<span class='o-ok'>0x00</span><br>[READ ] addr=15 data=<span class='o-ok'>0x7E</span>
+</div></div>
+<div class='cb'><h4>Key Concepts</h4><ul><li><code>logic [7:0] mem [0:15]</code> — packed width, unpacked depth</li><li><code>task automatic</code> — reentrant tasks with local stack</li></ul></div></div>
+<div class='program' id='p4'><div class='prog-header'><div class='prog-num'>4</div><div><div class='prog-title'>Traffic Light Controller</div><div class='prog-sub'>typedef enum · state display</div></div><span class='tag t-enum'>ENUM</span></div>
+<div class='slabel'>Objective</div><div class='obj'>Model a <strong>traffic light controller</strong> using an enumerated data type and display the different <strong>traffic-light states</strong>.</div>
+<div class='tabs'><button class='tb active' onclick="showTab('p4','c')">Code</button><button class='tb' onclick="showTab('p4','t')">Testbench</button><button class='tb' onclick="showTab('p4','o')">Output</button></div>
+<div id='p4-c' class='tc active'><pre><span class='kw'>module</span> <span class='mn'>traffic_light</span>;
+  <span class='kw'>typedef enum logic</span>[<span class='nm'>1:0</span>]{RED=<span class='nm'>2'b00</span>,GREEN=<span class='nm'>2'b01</span>,YELLOW=<span class='nm'>2'b10</span>} light_state_t;
+  light_state_t state;
+  <span class='kw'>initial begin</span>
+    state=RED;    <span class='op'>$display</span>(<span class='st'>&quot;State:%-8s [%b] STOP!&quot;</span>,state.name(),state); #<span class='nm'>30</span>;
+    state=GREEN;  <span class='op'>$display</span>(<span class='st'>&quot;State:%-8s [%b] GO!&quot;</span>,state.name(),state);   #<span class='nm'>25</span>;
+    state=YELLOW; <span class='op'>$display</span>(<span class='st'>&quot;State:%-8s [%b] CAUTION!&quot;</span>,state.name(),state); #<span class='nm'>5</span>;
+    state=RED;    <span class='op'>$display</span>(<span class='st'>&quot;State:%-8s [%b] STOP!&quot;</span>,state.name(),state);
+  <span class='kw'>end</span>
+<span class='kw'>endmodule</span></pre></div>
+<div id='p4-t' class='tc'><pre><span class='kw'>module</span> <span class='mn'>tb_tl</span>; <span class='mn'>traffic_light</span> dut(); <span class='kw'>initial begin</span> #<span class='nm'>200</span>; <span class='op'>$finish</span>; <span class='kw'>end endmodule</span></pre></div>
+<div id='p4-o' class='tc'><div class='ob'>
+State:<span class='o-err'>RED      [00] STOP!</span><br>State:<span class='o-ok'>GREEN    [01] GO!</span><br>State:<span class='o-warn'>YELLOW   [10] CAUTION!</span><br>State:<span class='o-err'>RED      [00] STOP!</span>
+</div></div><div class='cb'><h4>Key Concepts</h4><ul><li><code>typedef enum logic [1:0]</code> — 2-bit symbolic state type</li><li><code>.name()</code> — built-in method returns string label of enum</li></ul></div></div>
+<div class='program' id='p5'><div class='prog-header'><div class='prog-num'>5</div><div><div class='prog-title'>FIFO Buffer using Queue</div><div class='prog-sub'>push_back · pop_front · overflow guard</div></div><span class='tag t-q'>QUEUE</span></div>
+<div class='slabel'>Objective</div><div class='obj'>Implement a <strong>FIFO buffer using a queue</strong> and demonstrate <strong>insertion and deletion</strong> of data.</div>
+<div class='tabs'><button class='tb active' onclick="showTab('p5','c')">Code</button><button class='tb' onclick="showTab('p5','t')">Testbench</button><button class='tb' onclick="showTab('p5','o')">Output</button></div>
+<div id='p5-c' class='tc active'><pre><span class='kw'>module</span> <span class='mn'>fifo_queue</span>;
+  <span class='kw'>int</span> fifo[$]; <span class='kw'>int</span> item; <span class='kw'>int</span> capacity=<span class='nm'>5</span>;
+  <span class='kw'>task automatic</span> <span class='fn'>push</span>(<span class='kw'>input int</span> data);
+    <span class='kw'>if</span>(fifo.size()&lt;capacity) begin fifo.push_back(data);
+      <span class='op'>$display</span>(<span class='st'>&quot;[PUSH] %0d | size=%0d | %p&quot;</span>,data,fifo.size(),fifo);
+    end else <span class='op'>$display</span>(<span class='st'>&quot;[PUSH FAIL] FIFO Full! %0d&quot;</span>,data);
+  <span class='kw'>endtask</span>
+  <span class='kw'>task automatic</span> <span class='fn'>pop</span>();
+    <span class='kw'>if</span>(fifo.size()&gt;<span class='nm'>0</span>) begin item=fifo.pop_front();
+      <span class='op'>$display</span>(<span class='st'>&quot;[POP ] %0d | size=%0d | %p&quot;</span>,item,fifo.size(),fifo);
+    end else <span class='op'>$display</span>(<span class='st'>&quot;[POP FAIL] FIFO Empty!&quot;</span>);
+  <span class='kw'>endtask</span>
+  <span class='kw'>initial begin</span>
+    <span class='fn'>push</span>(<span class='nm'>10</span>);<span class='fn'>push</span>(<span class='nm'>20</span>);<span class='fn'>push</span>(<span class='nm'>30</span>);<span class='fn'>push</span>(<span class='nm'>40</span>);<span class='fn'>push</span>(<span class='nm'>50</span>);<span class='fn'>push</span>(<span class='nm'>60</span>);
+    <span class='fn'>pop</span>();<span class='fn'>pop</span>();<span class='fn'>pop</span>();
+    <span class='fn'>push</span>(<span class='nm'>70</span>);<span class='fn'>push</span>(<span class='nm'>80</span>);
+    <span class='fn'>pop</span>();<span class='fn'>pop</span>();<span class='fn'>pop</span>();<span class='fn'>pop</span>();<span class='fn'>pop</span>();
+  <span class='kw'>end</span>
+<span class='kw'>endmodule</span></pre></div>
+<div id='p5-t' class='tc'><pre><span class='kw'>module</span> <span class='mn'>tb_fifo</span>; <span class='mn'>fifo_queue</span> dut(); <span class='kw'>initial begin</span> #<span class='nm'>10</span>; <span class='op'>$finish</span>; <span class='kw'>end endmodule</span></pre></div>
+<div id='p5-o' class='tc'><div class='ob'>
+<span class='o-ok'>[PUSH] 10 | size=1 | '{10}</span><br><span class='o-ok'>[PUSH] 20 | size=2 | '{10,20}</span><br><span class='o-ok'>[PUSH] 30 | size=3 | '{10,20,30}</span><br><span class='o-ok'>[PUSH] 40 | size=4 | '{10,20,30,40}</span><br><span class='o-ok'>[PUSH] 50 | size=5 | '{10,20,30,40,50}</span><br>
+<span class='o-warn'>[PUSH FAIL] FIFO Full! 60</span><br>
+[POP ] 10 | size=4<br>[POP ] 20 | size=3<br>[POP ] 30 | size=2<br>
+<span class='o-ok'>[PUSH] 70 | size=3</span><br><span class='o-ok'>[PUSH] 80 | size=4</span><br>
+[POP ] 40 size=3<br>[POP ] 50 size=2<br>[POP ] 70 size=1<br>[POP ] 80 size=0<br><span class='o-err'>[POP FAIL] FIFO Empty!</span>
+</div></div><div class='cb'><h4>Key Concepts</h4><ul><li><code>int q[$]</code> — unbounded dynamic queue</li><li><code>push_back()</code> enqueue; <code>pop_front()</code> dequeue (FIFO order)</li><li><code>q.size()</code> — current depth; <code>%p</code> prints entire queue</li></ul></div></div>
+<div class='program' id='p6'><div class='prog-header'><div class='prog-num'>6</div><div><div class='prog-title'>ALU with Case Statement</div><div class='prog-sub'>ADD · SUB · MUL · DIV · MOD</div></div><span class='tag t-fn'>CASE</span></div>
+<div class='slabel'>Objective</div><div class='obj'>Accept two operands and an operation code. Use a <strong>case statement</strong> to perform <strong>addition, subtraction, multiplication, division, and modulus</strong>.</div>
+<div class='tabs'><button class='tb active' onclick="showTab('p6','c')">Code</button><button class='tb' onclick="showTab('p6','t')">Testbench</button><button class='tb' onclick="showTab('p6','o')">Output</button></div>
+<div id='p6-c' class='tc active'><pre><span class='kw'>module</span> <span class='mn'>alu_case</span>;
+  <span class='kw'>int</span> a,b,result; <span class='kw'>logic</span>[<span class='nm'>2:0</span>] op;
+  <span class='kw'>initial begin</span>
+    a=<span class='nm'>20</span>; b=<span class='nm'>6</span>;
+    <span class='op'>$display</span>(<span class='st'>&quot;Operands A=%0d B=%0d&quot;</span>,a,b);
+    <span class='kw'>for</span>(<span class='kw'>int</span> code=<span class='nm'>0</span>;code&lt;=<span class='nm'>4</span>;code++) <span class='kw'>begin</span>
+      op=code;
+      <span class='kw'>case</span>(op)
+        <span class='nm'>3'd0</span>: begin result=a+b; <span class='op'>$display</span>(<span class='st'>&quot;ADD: %0d&quot;</span>,result); end
+        <span class='nm'>3'd1</span>: begin result=a-b; <span class='op'>$display</span>(<span class='st'>&quot;SUB: %0d&quot;</span>,result); end
+        <span class='nm'>3'd2</span>: begin result=a*b; <span class='op'>$display</span>(<span class='st'>&quot;MUL: %0d&quot;</span>,result); end
+        <span class='nm'>3'd3</span>: begin result=a/b; <span class='op'>$display</span>(<span class='st'>&quot;DIV: %0d&quot;</span>,result); end
+        <span class='nm'>3'd4</span>: begin result=a%b; <span class='op'>$display</span>(<span class='st'>&quot;MOD: %0d&quot;</span>,result); end
+        <span class='kw'>default</span>: <span class='op'>$display</span>(<span class='st'>&quot;Unknown&quot;</span>);
+      <span class='kw'>endcase</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+<span class='kw'>endmodule</span></pre></div>
+<div id='p6-t' class='tc'><pre><span class='kw'>module</span> <span class='mn'>tb_alu</span>; <span class='mn'>alu_case</span> dut(); <span class='kw'>initial begin</span> #<span class='nm'>10</span>; <span class='op'>$finish</span>; <span class='kw'>end endmodule</span></pre></div>
+<div id='p6-o' class='tc'><div class='ob'>Operands A=<span class='o-val'>20</span> B=<span class='o-val'>6</span><br><span class='o-ok'>ADD: 26</span><br><span class='o-ok'>SUB: 14</span><br><span class='o-ok'>MUL: 120</span><br><span class='o-ok'>DIV: 3</span><br><span class='o-ok'>MOD: 2</span></div></div>
+<div class='cb'><h4>Key Concepts</h4><ul><li><code>case(op)</code> — multi-way decode of operation code</li><li><code>for</code> loop drives op codes 0-4 sequentially</li><li>Integer <code>%</code> operator for modulus</li></ul></div></div>
+<div class='program' id='p7'><div class='prog-header'><div class='prog-num'>7</div><div><div class='prog-title'>Traffic Signal Sequence</div><div class='prog-sub'>Enum + Timing · RED→GREEN→YELLOW→RED</div></div><span class='tag t-enum'>ENUM+TIMING</span></div>
+<div class='slabel'>Objective</div><div class='obj'>Model a traffic signal using enum. Use procedural statements and timing to implement <strong>RED → GREEN → YELLOW → RED</strong>.</div>
+<div class='tabs'><button class='tb active' onclick="showTab('p7','c')">Code</button><button class='tb' onclick="showTab('p7','t')">Testbench</button><button class='tb' onclick="showTab('p7','o')">Output</button></div>
+<div id='p7-c' class='tc active'><pre><span class='kw'>module</span> <span class='mn'>traffic_signal</span>;
+  <span class='kw'>typedef enum logic</span>[<span class='nm'>1:0</span>]{RED=<span class='nm'>2'b00</span>,GREEN=<span class='nm'>2'b01</span>,YELLOW=<span class='nm'>2'b10</span>} state_t;
+  state_t cur; <span class='kw'>int</span> cycle;
+  <span class='kw'>initial begin</span>
+    <span class='kw'>for</span>(cycle=<span class='nm'>0</span>;cycle&lt;<span class='nm'>3</span>;cycle++) <span class='kw'>begin</span>
+      cur=RED;    <span class='op'>$display</span>(<span class='st'>&quot;%5t  %-8s STOP&quot;</span>,$time,cur.name()); #<span class='nm'>30</span>;
+      cur=GREEN;  <span class='op'>$display</span>(<span class='st'>&quot;%5t  %-8s GO&quot;</span>,$time,cur.name());   #<span class='nm'>25</span>;
+      cur=YELLOW; <span class='op'>$display</span>(<span class='st'>&quot;%5t  %-8s CAUTION&quot;</span>,$time,cur.name()); #<span class='nm'>5</span>;
+    <span class='kw'>end</span>
+    <span class='op'>$display</span>(<span class='st'>&quot;Sequence complete&quot;</span>);
+  <span class='kw'>end</span>
+<span class='kw'>endmodule</span></pre></div>
+<div id='p7-t' class='tc'><pre><span class='kw'>module</span> <span class='mn'>tb_ts</span>; <span class='mn'>traffic_signal</span> dut(); <span class='kw'>initial begin</span> #<span class='nm'>500</span>; <span class='op'>$finish</span>; <span class='kw'>end endmodule</span></pre></div>
+<div id='p7-o' class='tc'><div class='ob'>
+<span class='o-err'>    0  RED      STOP</span><br><span class='o-ok'>   30  GREEN    GO</span><br><span class='o-warn'>   55  YELLOW   CAUTION</span><br>
+<span class='o-err'>   60  RED      STOP</span><br><span class='o-ok'>   90  GREEN    GO</span><br><span class='o-warn'>  115  YELLOW   CAUTION</span><br>
+<span class='o-err'>  120  RED      STOP</span><br><span class='o-ok'>  150  GREEN    GO</span><br><span class='o-warn'>  175  YELLOW   CAUTION</span><br>
+Sequence complete
+</div></div><div class='cb'><h4>Key Concepts</h4><ul><li><code>#N</code> time delay in simulation units</li><li><code>$time</code> — current simulation time</li><li><code>for</code> loop repeats full cycle 3 times</li></ul></div></div>
+<div class='program' id='p8'><div class='prog-header'><div class='prog-num'>8</div><div><div class='prog-title'>Concurrent Processes — fork/join Variants</div><div class='prog-sub'>fork...join · fork...join_any · fork...join_none</div></div><span class='tag t-fork'>FORK/JOIN</span></div>
+<div class='slabel'>Objective</div><div class='obj'>Three concurrent processes (generate, process, monitor). Demonstrate <strong>fork...join</strong>, <strong>fork...join_any</strong>, and <strong>fork...join_none</strong>.</div>
+<div class='tabs'><button class='tb active' onclick="showTab('p8','c')">Code</button><button class='tb' onclick="showTab('p8','t')">Testbench</button><button class='tb' onclick="showTab('p8','o')">Output</button></div>
+<div id='p8-c' class='tc active'><pre><span class='kw'>module</span> <span class='mn'>fork_join_demo</span>;
+  <span class='kw'>int</span> shared_data;
+  <span class='kw'>task automatic</span> <span class='fn'>gen_data</span>();  #<span class='nm'>5</span>;  shared_data=$urandom_range(<span class='nm'>1</span>,<span class='nm'>100</span>);
+    <span class='op'>$display</span>(<span class='st'>&quot;[%0t] GEN : data=%0d&quot;</span>,$time,shared_data); <span class='kw'>endtask</span>
+  <span class='kw'>task automatic</span> <span class='fn'>proc_data</span>(); #<span class='nm'>10</span>;
+    <span class='op'>$display</span>(<span class='st'>&quot;[%0t] PROC: x2=%0d&quot;</span>,$time,shared_data*<span class='nm'>2</span>); <span class='kw'>endtask</span>
+  <span class='kw'>task automatic</span> <span class='fn'>mon_data</span>();  #<span class='nm'>15</span>;
+    <span class='op'>$display</span>(<span class='st'>&quot;[%0t] MON : done&quot;</span>,$time); <span class='kw'>endtask</span>
+
+  <span class='kw'>initial begin</span>
+    <span class='op'>$display</span>(<span class='st'>&quot;=== fork...join (wait ALL) ===&quot;</span>);
+    <span class='kw'>fork</span> <span class='fn'>gen_data</span>(); <span class='fn'>proc_data</span>(); <span class='fn'>mon_data</span>(); <span class='kw'>join</span>
+    <span class='op'>$display</span>(<span class='st'>&quot;[%0t] All threads done\n&quot;</span>,$time);
+
+    <span class='op'>$display</span>(<span class='st'>&quot;=== fork...join_any (wait FIRST) ===&quot;</span>);
+    <span class='kw'>fork</span>
+      begin #<span class='nm'>3</span>;  <span class='op'>$display</span>(<span class='st'>&quot;[%0t] A done&quot;</span>,$time); end
+      begin #<span class='nm'>7</span>;  <span class='op'>$display</span>(<span class='st'>&quot;[%0t] B done&quot;</span>,$time); end
+      begin #<span class='nm'>12</span>; <span class='op'>$display</span>(<span class='st'>&quot;[%0t] C done&quot;</span>,$time); end
+    <span class='kw'>join_any</span>
+    <span class='op'>$display</span>(<span class='st'>&quot;[%0t] join_any returned\n&quot;</span>,$time);
+
+    <span class='op'>$display</span>(<span class='st'>&quot;=== fork...join_none (no wait) ===&quot;</span>);
+    <span class='kw'>fork</span>
+      begin #<span class='nm'>2</span>; <span class='op'>$display</span>(<span class='st'>&quot;[%0t] BG1 done&quot;</span>,$time); end
+      begin #<span class='nm'>4</span>; <span class='op'>$display</span>(<span class='st'>&quot;[%0t] BG2 done&quot;</span>,$time); end
+    <span class='kw'>join_none</span>
+    <span class='op'>$display</span>(<span class='st'>&quot;[%0t] join_none returned immediately&quot;</span>,$time);
+    #<span class='nm'>10</span>; <span class='op'>$display</span>(<span class='st'>&quot;[%0t] BG tasks finished&quot;</span>,$time);
+  <span class='kw'>end</span>
+<span class='kw'>endmodule</span></pre></div>
+<div id='p8-t' class='tc'><pre><span class='kw'>module</span> <span class='mn'>tb_fork</span>; <span class='mn'>fork_join_demo</span> dut(); <span class='kw'>initial begin</span> #<span class='nm'>500</span>; <span class='op'>$finish</span>; <span class='kw'>end endmodule</span></pre></div>
+<div id='p8-o' class='tc'><div class='ob'>
+<span class='o-sep'>=== fork...join (wait ALL) ===</span><br>
+[5]  GEN : data=<span class='o-val'>42</span><br>[10] PROC: x2=<span class='o-val'>84</span><br>[15] MON : done<br><span class='o-ok'>[15] All threads done</span><br><br>
+<span class='o-sep'>=== fork...join_any (wait FIRST) ===</span><br>
+[18] A done<br><span class='o-warn'>[18] join_any returned</span><br><br>
+<span class='o-sep'>=== fork...join_none (no wait) ===</span><br>
+<span class='o-warn'>[18] join_none returned immediately</span><br>[20] BG1 done<br>[22] BG2 done<br>[28] BG tasks finished
+</div></div>
+<div class='cb'><h4>Key Concepts</h4><ul>
+<li><code>fork...join</code> — blocks until ALL spawned threads finish</li>
+<li><code>fork...join_any</code> — blocks until FIRST thread finishes; others continue</li>
+<li><code>fork...join_none</code> — spawns threads and returns immediately</li>
+<li><code>task automatic</code> — each fork invocation gets its own stack frame</li>
+</ul></div></div>
+<div class='program' id='p9'><div class='prog-header'><div class='prog-num'>9</div><div><div class='prog-title'>16x8 Memory with Read/Write Tasks</div><div class='prog-sub'>Tasks with output · boundary checking</div></div><span class='tag t-fn'>TASKS</span></div>
+<div class='slabel'>Objective</div><div class='obj'>Model a <strong>16x8-bit memory</strong>, create separate tasks for writing/reading. Perform multiple read/write operations and display results.</div>
+<div class='tabs'><button class='tb active' onclick="showTab('p9','c')">Code</button><button class='tb' onclick="showTab('p9','t')">Testbench</button><button class='tb' onclick="showTab('p9','o')">Output</button></div>
+<div id='p9-c' class='tc active'><pre><span class='kw'>module</span> <span class='mn'>memory_task</span>;
+  <span class='kw'>logic</span>[<span class='nm'>7:0</span>] mem[<span class='nm'>0:15</span>];
+
+  <span class='kw'>task automatic</span> <span class='fn'>mem_write</span>(<span class='kw'>input int</span> addr, <span class='kw'>input logic</span>[<span class='nm'>7:0</span>] data);
+    <span class='kw'>if</span>(addr>=<span class='nm'>0</span> && addr<=<span class='nm'>15</span>) begin
+      mem[addr]=data; <span class='op'>$display</span>(<span class='st'>&quot;[WR] Addr[%2d] &lt;- 0x%02h&quot;</span>,addr,data);
+    end else <span class='op'>$display</span>(<span class='st'>&quot;[WR] ERROR: addr %0d out of range!&quot;</span>,addr);
+  <span class='kw'>endtask</span>
+
+  <span class='kw'>task automatic</span> <span class='fn'>mem_read</span>(<span class='kw'>input int</span> addr, <span class='kw'>output logic</span>[<span class='nm'>7:0</span>] data);
+    <span class='kw'>if</span>(addr>=<span class='nm'>0</span> && addr<=<span class='nm'>15</span>) begin
+      data=mem[addr]; <span class='op'>$display</span>(<span class='st'>&quot;[RD] Addr[%2d] -&gt; 0x%02h&quot;</span>,addr,data);
+    end else begin data=<span class='nm'>8'hXX</span>; <span class='op'>$display</span>(<span class='st'>&quot;[RD] ERROR: addr %0d out of range!&quot;</span>,addr); end
+  <span class='kw'>endtask</span>
+
+  <span class='kw'>logic</span>[<span class='nm'>7:0</span>] rdata;
+  <span class='kw'>initial begin</span>
+    <span class='kw'>for</span>(<span class='kw'>int</span> i=<span class='nm'>0</span>;i&lt;<span class='nm'>16</span>;i++) mem[i]=<span class='nm'>8'h00</span>;
+    <span class='fn'>mem_write</span>(<span class='nm'>0</span>,<span class='nm'>8'hAA</span>); <span class='fn'>mem_write</span>(<span class='nm'>3</span>,<span class='nm'>8'h55</span>); <span class='fn'>mem_write</span>(<span class='nm'>7</span>,<span class='nm'>8'hFF</span>);
+    <span class='fn'>mem_write</span>(<span class='nm'>12</span>,<span class='nm'>8'h1F</span>); <span class='fn'>mem_write</span>(<span class='nm'>15</span>,<span class='nm'>8'hDE</span>);
+    <span class='fn'>mem_read</span>(<span class='nm'>0</span>,rdata); <span class='fn'>mem_read</span>(<span class='nm'>3</span>,rdata); <span class='fn'>mem_read</span>(<span class='nm'>7</span>,rdata);
+    <span class='fn'>mem_read</span>(<span class='nm'>12</span>,rdata); <span class='fn'>mem_read</span>(<span class='nm'>15</span>,rdata);
+    <span class='fn'>mem_write</span>(<span class='nm'>7</span>,<span class='nm'>8'h42</span>); <span class='fn'>mem_read</span>(<span class='nm'>7</span>,rdata);
+    <span class='fn'>mem_write</span>(<span class='nm'>16</span>,<span class='nm'>8'hBB</span>); <span class='fn'>mem_read</span>(-<span class='nm'>1</span>,rdata);
+  <span class='kw'>end</span>
+<span class='kw'>endmodule</span></pre></div>
+<div id='p9-t' class='tc'><pre><span class='kw'>module</span> <span class='mn'>tb_mt</span>; <span class='mn'>memory_task</span> dut(); <span class='kw'>initial begin</span> #<span class='nm'>10</span>; <span class='op'>$finish</span>; <span class='kw'>end endmodule</span></pre></div>
+<div id='p9-o' class='tc'><div class='ob'>
+[WR] Addr[ 0] &lt;- <span class='o-val'>0xAA</span><br>[WR] Addr[ 3] &lt;- <span class='o-val'>0x55</span><br>[WR] Addr[ 7] &lt;- <span class='o-val'>0xFF</span><br>[WR] Addr[12] &lt;- <span class='o-val'>0x1F</span><br>[WR] Addr[15] &lt;- <span class='o-val'>0xDE</span><br>
+[RD] Addr[ 0] -&gt; <span class='o-ok'>0xAA</span><br>[RD] Addr[ 3] -&gt; <span class='o-ok'>0x55</span><br>[RD] Addr[ 7] -&gt; <span class='o-ok'>0xFF</span><br>[RD] Addr[12] -&gt; <span class='o-ok'>0x1F</span><br>[RD] Addr[15] -&gt; <span class='o-ok'>0xDE</span><br>
+[WR] Addr[ 7] &lt;- <span class='o-val'>0x42</span><br>[RD] Addr[ 7] -&gt; <span class='o-ok'>0x42</span><br>
+<span class='o-err'>[WR] ERROR: addr 16 out of range!</span><br><span class='o-err'>[RD] ERROR: addr -1 out of range!</span>
+</div></div>
+<div class='cb'><h4>Key Concepts</h4><ul><li>Task with <code>output</code> argument returns data to caller</li><li>Boundary guard prevents illegal memory access</li><li>Overwrite + re-read pattern verifies correct write</li></ul></div></div>
+<div class='program' id='p10'><div class='prog-header'><div class='prog-num'>10</div><div><div class='prog-title'>4-bit ALU — Function + Task</div><div class='prog-sub'>ADD · SUB · AND · OR · XOR + PASS/FAIL verification</div></div><span class='tag t-fn'>FUNCTION+TASK</span></div>
+<div class='slabel'>Objective</div><div class='obj'>Develop a <strong>4-bit ALU</strong> supporting ADD, SUB, AND, OR, XOR. Use a <strong>function</strong> to compute result and a <strong>task</strong> to display and verify.</div>
+<div class='tabs'><button class='tb active' onclick="showTab('p10','c')">Code</button><button class='tb' onclick="showTab('p10','t')">Testbench</button><button class='tb' onclick="showTab('p10','o')">Output</button></div>
+<div id='p10-c' class='tc active'><pre><span class='kw'>module</span> <span class='mn'>alu_4bit</span>;
+  <span class='kw'>typedef enum logic</span>[<span class='nm'>2:0</span>]{ADD=<span class='nm'>0</span>,SUB=<span class='nm'>1</span>,AND_OP=<span class='nm'>2</span>,OR_OP=<span class='nm'>3</span>,XOR_OP=<span class='nm'>4</span>} alu_op_t;
+
+  <span class='kw'>function automatic logic</span>[<span class='nm'>4:0</span>] <span class='fn'>alu_compute</span>(<span class='kw'>input logic</span>[<span class='nm'>3:0</span>] a,b, <span class='kw'>input</span> alu_op_t op);
+    <span class='kw'>logic</span>[<span class='nm'>4:0</span>] res;
+    <span class='kw'>case</span>(op)
+      ADD:    res={<span class='nm'>1'b0</span>,a}+{<span class='nm'>1'b0</span>,b};
+      SUB:    res={<span class='nm'>1'b0</span>,a}-{<span class='nm'>1'b0</span>,b};
+      AND_OP: res={<span class='nm'>1'b0</span>,a&amp;b};
+      OR_OP:  res={<span class='nm'>1'b0</span>,a|b};
+      XOR_OP: res={<span class='nm'>1'b0</span>,a^b};
+      <span class='kw'>default</span>: res=<span class='nm'>5'bx</span>;
+    <span class='kw'>endcase</span>
+    <span class='kw'>return</span> res;
+  <span class='kw'>endfunction</span>
+
+  <span class='kw'>task automatic</span> <span class='fn'>display_result</span>(<span class='kw'>input logic</span>[<span class='nm'>3:0</span>] a,b, <span class='kw'>input</span> alu_op_t op, <span class='kw'>input logic</span>[<span class='nm'>4:0</span>] res);
+    <span class='kw'>string</span> op_str; <span class='kw'>logic</span>[<span class='nm'>4:0</span>] expected;
+    <span class='kw'>case</span>(op)
+      ADD:    begin op_str=<span class='st'>&quot;ADD&quot;</span>; expected={<span class='nm'>1'b0</span>,a}+{<span class='nm'>1'b0</span>,b}; end
+      SUB:    begin op_str=<span class='st'>&quot;SUB&quot;</span>; expected={<span class='nm'>1'b0</span>,a}-{<span class='nm'>1'b0</span>,b}; end
+      AND_OP: begin op_str=<span class='st'>&quot;AND&quot;</span>; expected={<span class='nm'>1'b0</span>,a&amp;b}; end
+      OR_OP:  begin op_str=<span class='st'>&quot;OR&quot;</span>;  expected={<span class='nm'>1'b0</span>,a|b}; end
+      XOR_OP: begin op_str=<span class='st'>&quot;XOR&quot;</span>; expected={<span class='nm'>1'b0</span>,a^b}; end
+    <span class='kw'>endcase</span>
+    <span class='op'>$display</span>(<span class='st'>&quot;%-3s A=%04b(%2d) B=%04b(%2d) Res=%05b(%2d) %s&quot;</span>,
+             op_str,a,a,b,b,res,res,(res===expected)?<span class='st'>&quot;PASS&quot;</span>:<span class='st'>&quot;FAIL&quot;</span>);
+  <span class='kw'>endtask</span>
+
+  <span class='kw'>logic</span>[<span class='nm'>3:0</span>] a,b; <span class='kw'>logic</span>[<span class='nm'>4:0</span>] result;
+  <span class='kw'>initial begin</span>
+    a=<span class='nm'>4'd9</span>; b=<span class='nm'>4'd5</span>; <span class='op'>$display</span>(<span class='st'>&quot;Test A=%0d B=%0d&quot;</span>,a,b);
+    <span class='kw'>for</span>(<span class='kw'>int</span> i=<span class='nm'>0</span>;i&lt;<span class='nm'>5</span>;i++) begin alu_op_t op=alu_op_t'(i);
+      result=<span class='fn'>alu_compute</span>(a,b,op); <span class='fn'>display_result</span>(a,b,op,result); end
+    a=<span class='nm'>4'd15</span>; b=<span class='nm'>4'd3</span>; <span class='op'>$display</span>(<span class='st'>&quot;Test A=%0d B=%0d&quot;</span>,a,b);
+    <span class='kw'>for</span>(<span class='kw'>int</span> i=<span class='nm'>0</span>;i&lt;<span class='nm'>5</span>;i++) begin alu_op_t op=alu_op_t'(i);
+      result=<span class='fn'>alu_compute</span>(a,b,op); <span class='fn'>display_result</span>(a,b,op,result); end
+  <span class='kw'>end</span>
+<span class='kw'>endmodule</span></pre></div>
+<div id='p10-t' class='tc'><pre><span class='kw'>module</span> <span class='mn'>tb_alu4</span>; <span class='mn'>alu_4bit</span> dut(); <span class='kw'>initial begin</span> #<span class='nm'>10</span>; <span class='op'>$finish</span>; <span class='kw'>end endmodule</span></pre></div>
+<div id='p10-o' class='tc'><div class='ob'>
+Test A=9 B=5<br>
+<span class='o-ok'>ADD A=1001( 9) B=0101( 5) Res=01110(14) PASS</span><br>
+<span class='o-ok'>SUB A=1001( 9) B=0101( 5) Res=00100( 4) PASS</span><br>
+<span class='o-ok'>AND A=1001( 9) B=0101( 5) Res=00001( 1) PASS</span><br>
+<span class='o-ok'>OR  A=1001( 9) B=0101( 5) Res=01101(13) PASS</span><br>
+<span class='o-ok'>XOR A=1001( 9) B=0101( 5) Res=01100(12) PASS</span><br>
+Test A=15 B=3<br>
+<span class='o-ok'>ADD A=1111(15) B=0011( 3) Res=10010(18) PASS</span><br>
+<span class='o-ok'>SUB A=1111(15) B=0011( 3) Res=01100(12) PASS</span><br>
+<span class='o-ok'>AND A=1111(15) B=0011( 3) Res=00011( 3) PASS</span><br>
+<span class='o-ok'>OR  A=1111(15) B=0011( 3) Res=01111(15) PASS</span><br>
+<span class='o-ok'>XOR A=1111(15) B=0011( 3) Res=01100(12) PASS</span>
+</div></div>
+<div class='cb'><h4>Key Concepts</h4><ul><li><code>function automatic</code> — returns a value; executes in zero simulation time</li><li><code>task automatic</code> — used for display + self-checking (PASS/FAIL)</li><li>5-bit result captures carry/borrow from 4-bit operations</li><li><code>===</code> 4-state equality (X/Z safe comparison)</li></ul></div></div>
+</div><!-- container -->
+<script>
+function showTab(prog,tab){
+  document.querySelectorAll('#'+prog+'-c,#'+prog+'-t,#'+prog+'-o').forEach(e=>e.classList.remove('active'));
+  document.querySelectorAll('#'+prog+' .tb').forEach(b=>b.classList.remove('active'));
+  document.getElementById(prog+'-'+tab).classList.add('active');
+  event.target.classList.add('active');
+}
+</script></body></html>
