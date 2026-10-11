@@ -1,0 +1,15 @@
+rtl/pkg/rv32_pkg.sv
+rtl/bus/apb_if.sv
+rtl/cpu/alu.sv
+rtl/cpu/immediate_generator.sv
+rtl/cpu/control_unit.sv
+rtl/cpu/program_counter.sv
+rtl/cpu/register_file.sv
+rtl/cpu/instruction_memory.sv
+rtl/cpu/data_memory.sv
+rtl/cpu/rv32i_single_cycle_core.sv
+rtl/bus/apb_bridge.sv
+rtl/bus/apb_interconnect.sv
+rtl/peripherals/apb_timer.sv
+rtl/bus/apb_subsystem.sv
+rtl/top.sv
